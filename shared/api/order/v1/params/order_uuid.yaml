@@ -1,0 +1,9 @@
+name: order_uuid
+in: path
+required: true
+description: Универсальный идентификатор заказа
+schema:
+  type: string
+  format: uuid
+  minLength: 0
+  maxLength: 100
