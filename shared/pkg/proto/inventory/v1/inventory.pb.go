@@ -80,19 +80,19 @@ func (Category) EnumDescriptor() ([]byte, []int) {
 
 // Part представляет запчасть с ее основной информацией и метаданными
 type Part struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uuid          string                 `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Price         float64                `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
-	StockQuantity int64                  `protobuf:"varint,5,opt,name=stock_quantity,json=stockQuantity,proto3" json:"stock_quantity,omitempty"`
-	Category      Category               `protobuf:"varint,6,opt,name=category,proto3,enum=inventory.v1.Category" json:"category,omitempty"`
-	Dimensions    *Dimensions            `protobuf:"bytes,7,opt,name=dimensions,proto3" json:"dimensions,omitempty"`
-	Manufacturer  *Manufacturer          `protobuf:"bytes,8,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
-	Tags          []string               `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty"`
-	Metadata      map[string]*Value      `protobuf:"bytes,10,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Uuid          string                    `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	Name          string                    `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                    `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Price         float64                   `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
+	StockQuantity int64                     `protobuf:"varint,5,opt,name=stock_quantity,json=stockQuantity,proto3" json:"stock_quantity,omitempty"`
+	Category      Category                  `protobuf:"varint,6,opt,name=category,proto3,enum=inventory.v1.Category" json:"category,omitempty"`
+	Dimensions    *Dimensions               `protobuf:"bytes,7,opt,name=dimensions,proto3" json:"dimensions,omitempty"`
+	Manufacturer  *Manufacturer             `protobuf:"bytes,8,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Tags          []string                  `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty"`
+	Metadata      map[string]*MetadataValue `protobuf:"bytes,10,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	CreatedAt     *timestamppb.Timestamp    `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp    `protobuf:"bytes,12,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -190,7 +190,7 @@ func (x *Part) GetTags() []string {
 	return nil
 }
 
-func (x *Part) GetMetadata() map[string]*Value {
+func (x *Part) GetMetadata() map[string]*MetadataValue {
 	if x != nil {
 		return x.Metadata
 	}
@@ -599,33 +599,33 @@ func (x *ListPartsResponse) GetParts() []*Part {
 }
 
 // Значение метаданных запчасти, может быть строкой, числом или булевым значением
-type Value struct {
+type MetadataValue struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Value:
 	//
-	//	*Value_StringValue
-	//	*Value_Int64Value
-	//	*Value_DoubleValue
-	//	*Value_BoolValue
-	Value         isValue_Value `protobuf_oneof:"value"`
+	//	*MetadataValue_StringValue
+	//	*MetadataValue_Int64Value
+	//	*MetadataValue_DoubleValue
+	//	*MetadataValue_BoolValue
+	Value         isMetadataValue_Value `protobuf_oneof:"value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Value) Reset() {
-	*x = Value{}
+func (x *MetadataValue) Reset() {
+	*x = MetadataValue{}
 	mi := &file_inventory_v1_inventory_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Value) String() string {
+func (x *MetadataValue) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Value) ProtoMessage() {}
+func (*MetadataValue) ProtoMessage() {}
 
-func (x *Value) ProtoReflect() protoreflect.Message {
+func (x *MetadataValue) ProtoReflect() protoreflect.Message {
 	mi := &file_inventory_v1_inventory_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -637,87 +637,87 @@ func (x *Value) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Value.ProtoReflect.Descriptor instead.
-func (*Value) Descriptor() ([]byte, []int) {
+// Deprecated: Use MetadataValue.ProtoReflect.Descriptor instead.
+func (*MetadataValue) Descriptor() ([]byte, []int) {
 	return file_inventory_v1_inventory_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *Value) GetValue() isValue_Value {
+func (x *MetadataValue) GetValue() isMetadataValue_Value {
 	if x != nil {
 		return x.Value
 	}
 	return nil
 }
 
-func (x *Value) GetStringValue() string {
+func (x *MetadataValue) GetStringValue() string {
 	if x != nil {
-		if x, ok := x.Value.(*Value_StringValue); ok {
+		if x, ok := x.Value.(*MetadataValue_StringValue); ok {
 			return x.StringValue
 		}
 	}
 	return ""
 }
 
-func (x *Value) GetInt64Value() int64 {
+func (x *MetadataValue) GetInt64Value() int64 {
 	if x != nil {
-		if x, ok := x.Value.(*Value_Int64Value); ok {
+		if x, ok := x.Value.(*MetadataValue_Int64Value); ok {
 			return x.Int64Value
 		}
 	}
 	return 0
 }
 
-func (x *Value) GetDoubleValue() float64 {
+func (x *MetadataValue) GetDoubleValue() float64 {
 	if x != nil {
-		if x, ok := x.Value.(*Value_DoubleValue); ok {
+		if x, ok := x.Value.(*MetadataValue_DoubleValue); ok {
 			return x.DoubleValue
 		}
 	}
 	return 0
 }
 
-func (x *Value) GetBoolValue() bool {
+func (x *MetadataValue) GetBoolValue() bool {
 	if x != nil {
-		if x, ok := x.Value.(*Value_BoolValue); ok {
+		if x, ok := x.Value.(*MetadataValue_BoolValue); ok {
 			return x.BoolValue
 		}
 	}
 	return false
 }
 
-type isValue_Value interface {
-	isValue_Value()
+type isMetadataValue_Value interface {
+	isMetadataValue_Value()
 }
 
-type Value_StringValue struct {
+type MetadataValue_StringValue struct {
 	StringValue string `protobuf:"bytes,1,opt,name=string_value,json=stringValue,proto3,oneof"`
 }
 
-type Value_Int64Value struct {
+type MetadataValue_Int64Value struct {
 	Int64Value int64 `protobuf:"varint,2,opt,name=int64_value,json=int64Value,proto3,oneof"`
 }
 
-type Value_DoubleValue struct {
+type MetadataValue_DoubleValue struct {
 	DoubleValue float64 `protobuf:"fixed64,3,opt,name=double_value,json=doubleValue,proto3,oneof"`
 }
 
-type Value_BoolValue struct {
+type MetadataValue_BoolValue struct {
 	BoolValue bool `protobuf:"varint,4,opt,name=bool_value,json=boolValue,proto3,oneof"`
 }
 
-func (*Value_StringValue) isValue_Value() {}
+func (*MetadataValue_StringValue) isMetadataValue_Value() {}
 
-func (*Value_Int64Value) isValue_Value() {}
+func (*MetadataValue_Int64Value) isMetadataValue_Value() {}
 
-func (*Value_DoubleValue) isValue_Value() {}
+func (*MetadataValue_DoubleValue) isMetadataValue_Value() {}
 
-func (*Value_BoolValue) isValue_Value() {}
+func (*MetadataValue_BoolValue) isMetadataValue_Value() {}
 
 var File_inventory_v1_inventory_proto protoreflect.FileDescriptor
 
 const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\n" +
-	"\x1cinventory/v1/inventory.proto\x12\finventory.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd5\x04\n" +
+	"\x1cinventory/v1/inventory.proto\x12\finventory.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xdd\x04\n" +
 	"\x04Part\x12\x12\n" +
 	"\x04uuid\x18\x01 \x01(\tR\x04uuid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -735,10 +735,10 @@ const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x1aP\n" +
+	"updated_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x1aX\n" +
 	"\rMetadataEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12)\n" +
-	"\x05value\x18\x02 \x01(\v2\x13.inventory.v1.ValueR\x05value:\x028\x01\"\xbc\x01\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x121\n" +
+	"\x05value\x18\x02 \x01(\v2\x1b.inventory.v1.MetadataValueR\x05value:\x028\x01\"\xbc\x01\n" +
 	"\vPartsFilter\x12\x14\n" +
 	"\x05uuids\x18\x01 \x03(\tR\x05uuids\x12\x14\n" +
 	"\x05names\x18\x02 \x03(\tR\x05names\x126\n" +
@@ -764,8 +764,8 @@ const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\x10ListPartsRequest\x121\n" +
 	"\x06filter\x18\x01 \x01(\v2\x19.inventory.v1.PartsFilterR\x06filter\"=\n" +
 	"\x11ListPartsResponse\x12(\n" +
-	"\x05parts\x18\x01 \x03(\v2\x12.inventory.v1.PartR\x05parts\"\x9e\x01\n" +
-	"\x05Value\x12#\n" +
+	"\x05parts\x18\x01 \x03(\v2\x12.inventory.v1.PartR\x05parts\"\xa6\x01\n" +
+	"\rMetadataValue\x12#\n" +
 	"\fstring_value\x18\x01 \x01(\tH\x00R\vstringValue\x12!\n" +
 	"\vint64_value\x18\x02 \x01(\x03H\x00R\n" +
 	"int64Value\x12#\n" +
@@ -807,7 +807,7 @@ var file_inventory_v1_inventory_proto_goTypes = []any{
 	(*GetPartResponse)(nil),       // 6: inventory.v1.GetPartResponse
 	(*ListPartsRequest)(nil),      // 7: inventory.v1.ListPartsRequest
 	(*ListPartsResponse)(nil),     // 8: inventory.v1.ListPartsResponse
-	(*Value)(nil),                 // 9: inventory.v1.Value
+	(*MetadataValue)(nil),         // 9: inventory.v1.MetadataValue
 	nil,                           // 10: inventory.v1.Part.MetadataEntry
 	(*timestamppb.Timestamp)(nil), // 11: google.protobuf.Timestamp
 }
@@ -822,7 +822,7 @@ var file_inventory_v1_inventory_proto_depIdxs = []int32{
 	1,  // 7: inventory.v1.GetPartResponse.part:type_name -> inventory.v1.Part
 	2,  // 8: inventory.v1.ListPartsRequest.filter:type_name -> inventory.v1.PartsFilter
 	1,  // 9: inventory.v1.ListPartsResponse.parts:type_name -> inventory.v1.Part
-	9,  // 10: inventory.v1.Part.MetadataEntry.value:type_name -> inventory.v1.Value
+	9,  // 10: inventory.v1.Part.MetadataEntry.value:type_name -> inventory.v1.MetadataValue
 	5,  // 11: inventory.v1.InventoryService.GetPart:input_type -> inventory.v1.GetPartRequest
 	7,  // 12: inventory.v1.InventoryService.ListParts:input_type -> inventory.v1.ListPartsRequest
 	6,  // 13: inventory.v1.InventoryService.GetPart:output_type -> inventory.v1.GetPartResponse
@@ -840,10 +840,10 @@ func file_inventory_v1_inventory_proto_init() {
 		return
 	}
 	file_inventory_v1_inventory_proto_msgTypes[8].OneofWrappers = []any{
-		(*Value_StringValue)(nil),
-		(*Value_Int64Value)(nil),
-		(*Value_DoubleValue)(nil),
-		(*Value_BoolValue)(nil),
+		(*MetadataValue_StringValue)(nil),
+		(*MetadataValue_Int64Value)(nil),
+		(*MetadataValue_DoubleValue)(nil),
+		(*MetadataValue_BoolValue)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

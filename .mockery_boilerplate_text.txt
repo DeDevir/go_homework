@@ -1,0 +1,2 @@
+// Code generated for DeDevir service
+// © DeDevir 2026.
