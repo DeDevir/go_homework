@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	inventoryApi "github.com/DeDevir/go_homework/inventory/internal/api/inventory/v1"
 	partRepository "github.com/DeDevir/go_homework/inventory/internal/repository/part"
 	partService "github.com/DeDevir/go_homework/inventory/internal/service/part"
 	inventoryV1 "github.com/DeDevir/go_homework/shared/pkg/proto/inventory/v1"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
@@ -20,6 +23,7 @@ const (
 )
 
 func main() {
+	ctx := context.Background()
 	listener, err := net.Listen(
 		"tcp",
 		fmt.Sprintf(":%d", port),
@@ -29,7 +33,13 @@ func main() {
 		return
 	}
 
-	partRepositoryLay := partRepository.NewRepository()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://inventory-service-user:inventory-service-password@localhost:27017"))
+	if err != nil {
+		log.Printf("Ошибка подключения к mongo database: %v\n", err)
+	}
+	mongoDb := client.Database("inventory-service") // docker
+
+	partRepositoryLay := partRepository.NewRepository(mongoDb)
 	partServiceLay := partService.NewService(partRepositoryLay)
 	api := inventoryApi.NewAPI(partServiceLay)
 

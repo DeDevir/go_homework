@@ -6,6 +6,7 @@ import (
 	orderApi "github.com/DeDevir/go_homework/order/internal/api/order/v1"
 	inventoryClientGrpc "github.com/DeDevir/go_homework/order/internal/client/grpc/inventory/v1"
 	paymentClientGrpc "github.com/DeDevir/go_homework/order/internal/client/grpc/payment/v1"
+	"github.com/DeDevir/go_homework/order/internal/migrator"
 	orderRepository "github.com/DeDevir/go_homework/order/internal/repository/order"
 	orderService "github.com/DeDevir/go_homework/order/internal/service/order"
 	orderV1 "github.com/DeDevir/go_homework/shared/pkg/openapi/order/v1"
@@ -13,6 +14,8 @@ import (
 	paymentV1 "github.com/DeDevir/go_homework/shared/pkg/proto/payment/v1"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -35,6 +38,8 @@ const (
 )
 
 func main() {
+	ctx := context.Background()
+
 	invetoryConn, err := grpc.NewClient(
 		net.JoinHostPort("localhost", inventoryServicePort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -55,10 +60,34 @@ func main() {
 		return
 	}
 
+	dbURI := "postgres://order-service-user:order-service-password@localhost:5432/order-service"
+	con, err := pgxpool.New(ctx, dbURI)
+	if err != nil {
+		log.Printf("failed to connect to database: %v\n", err)
+		return
+	}
+	defer func() {
+		con.Close()
+	}()
+
+	// Проверяем, что соединение с базой установлено
+	err = con.Ping(ctx)
+	if err != nil {
+		log.Printf("База данных недоступна: %v\n", err)
+		return
+	}
+
+	migrationsDir := "order/migrations"
+	migratorRunner := migrator.NewMigrator(stdlib.OpenDB(*con.Config().ConnConfig.Copy()), migrationsDir)
+	err = migratorRunner.Up()
+	if err != nil {
+		log.Printf("Ошибка миграции базы данных: %v\n", err)
+		return
+	}
+
 	paymentServiceClientGrpc := paymentV1.NewPaymentServiceClient(paymentConn)
 	paymentClient := paymentClientGrpc.NewClient(paymentServiceClientGrpc)
-
-	repository := orderRepository.NewRepository()
+	repository := orderRepository.NewRepository(con)
 	service := orderService.NewService(repository, inventoryClient, paymentClient)
 	api := orderApi.NewApi(service)
 

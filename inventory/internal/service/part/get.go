@@ -3,6 +3,7 @@ package part
 import (
 	"context"
 	"github.com/DeDevir/go_homework/inventory/internal/model"
+	"log"
 )
 
 func (s *service) Get(ctx context.Context, uuid string) (*model.Part, error) {
@@ -10,6 +11,8 @@ func (s *service) Get(ctx context.Context, uuid string) (*model.Part, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("finded part in service %v", part)
 
 	return part, nil
 }

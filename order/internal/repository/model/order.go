@@ -11,14 +11,15 @@ type Order struct {
 	PaymentMethod   *PaymentMethod
 	Status          OrderStatus
 	CreatedAt       time.Time
+	UpdatedAt       *time.Time
 }
 
 type OrderStatus string
 
 const (
 	OrderPaid     OrderStatus = "PAID"
-	OrderCanceled OrderStatus = "CANCELED"
-	OrderPending  OrderStatus = "PENDING"
+	OrderCanceled OrderStatus = "CANCELLED"
+	OrderPending  OrderStatus = "PENDING_PAYMENT"
 )
 
 type PaymentMethod string
@@ -27,6 +28,6 @@ const (
 	PaymentMethodUnknown       PaymentMethod = "UNKNOWN"
 	PaymentMethodCard          PaymentMethod = "CARD"
 	PaymentMethodSBP           PaymentMethod = "SBP"
-	PaymentMethodINVESTORMONEY PaymentMethod = "INVESTORMONEY"
-	PaymentMethodCREDITCARD    PaymentMethod = "CREDITCARD"
+	PaymentMethodINVESTORMONEY PaymentMethod = "INVESTOR_MONEY"
+	PaymentMethodCREDITCARD    PaymentMethod = "CREDIT_CARD"
 )

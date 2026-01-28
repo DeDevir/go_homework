@@ -5,6 +5,7 @@ import (
 	repoModel "github.com/DeDevir/go_homework/order/internal/repository/model"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
+	"log"
 )
 
 func ParseOrderModelToDto(order model.Order) *repoModel.Order {
@@ -65,7 +66,7 @@ func ParseOrderDtoToModel(order *repoModel.Order) *model.Order {
 		PartUUIDs:       partsUUIDs,
 		TotalPrice:      order.TotalPrice,
 		TransactionUUID: transactionUUID,
-		PaymentMethod:   parsePaymentMethodDtoToModel(*order.PaymentMethod),
+		PaymentMethod:   parsePaymentMethodDtoToModel(order.PaymentMethod),
 		Status:          parseStatusDtoToModel(order.Status),
 	}
 }
@@ -86,8 +87,11 @@ func parseTransactionUUIDDtoToModel(stringUuid *string) *uuid.UUID {
 	transactionUuid := uuid.MustParse(*stringUuid)
 	return &transactionUuid
 }
-func parsePaymentMethodDtoToModel(method repoModel.PaymentMethod) *model.PaymentMethod {
-	switch method {
+func parsePaymentMethodDtoToModel(method *repoModel.PaymentMethod) *model.PaymentMethod {
+	if method == nil {
+		return nil
+	}
+	switch *method {
 	case repoModel.PaymentMethodCard:
 		return lo.ToPtr(model.PaymentMethodCARD)
 	case repoModel.PaymentMethodCREDITCARD:
@@ -107,6 +111,7 @@ func parseStatusDtoToModel(status repoModel.OrderStatus) model.OrderStatus {
 	case repoModel.OrderCanceled:
 		return model.OrderStatusCANCELLED
 	default:
+		log.Printf("default case (%v)", status)
 		return model.OrderStatusPENDINGPAYMENT
 	}
 }
