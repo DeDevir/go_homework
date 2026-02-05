@@ -3,64 +3,50 @@ package main
 import (
 	"context"
 	"fmt"
-	inventoryApi "github.com/DeDevir/go_homework/inventory/internal/api/inventory/v1"
-	partRepository "github.com/DeDevir/go_homework/inventory/internal/repository/part"
-	partService "github.com/DeDevir/go_homework/inventory/internal/service/part"
-	inventoryV1 "github.com/DeDevir/go_homework/shared/pkg/proto/inventory/v1"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-	"log"
-	"net"
-	"os"
+	"github.com/DeDevir/go_homework/inventory/internal/app"
+	"github.com/DeDevir/go_homework/inventory/internal/config"
+	"github.com/DeDevir/go_homework/platform/pkg/closer"
+	"github.com/DeDevir/go_homework/platform/pkg/logger"
+	"go.uber.org/zap"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 const (
-	port = 50051
+	configPath = "./deploy/compose/inventory/.env"
 )
 
 func main() {
-	ctx := context.Background()
-	listener, err := net.Listen(
-		"tcp",
-		fmt.Sprintf(":%d", port),
-	)
+	err := config.Load(configPath)
 	if err != nil {
-		log.Printf("Error launch listener: %v", err)
+		panic(fmt.Errorf("failed to load config: %v", err))
+	}
+
+	appCtx, appCancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer appCancel()
+	defer gracefulShutdown()
+
+	closer.Configure(syscall.SIGINT, syscall.SIGTERM)
+
+	a, err := app.New(appCtx)
+	if err != nil {
+		logger.Error(appCtx, "❌ Не удалось создать приложение", zap.Error(err))
 		return
 	}
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://inventory-service-user:inventory-service-password@localhost:27017"))
+	err = a.Run(appCtx)
 	if err != nil {
-		log.Printf("Ошибка подключения к mongo database: %v\n", err)
+		logger.Error(appCtx, "❌ Ошибка при работе приложения", zap.Error(err))
+		return
 	}
-	mongoDb := client.Database("inventory-service") // docker
+}
 
-	partRepositoryLay := partRepository.NewRepository(mongoDb)
-	partServiceLay := partService.NewService(partRepositoryLay)
-	api := inventoryApi.NewAPI(partServiceLay)
+func gracefulShutdown() {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	server := grpc.NewServer()
-
-	inventoryV1.RegisterInventoryServiceServer(server, api)
-
-	reflection.Register(server)
-
-	go func() {
-		log.Printf("GRPC Inventory Server start to listen on %v port", port)
-		err = server.Serve(listener)
-		if err != nil {
-			log.Printf("Failed to serve")
-		}
-	}()
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("🛑 Shutting down gRPC server...")
-	server.GracefulStop()
-	log.Println("✅ Server stopped")
+	if err := closer.CloseAll(ctx); err != nil {
+		logger.Error(ctx, "❌ Ошибка при завершении работы", zap.Error(err))
+	}
 }

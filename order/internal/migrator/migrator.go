@@ -1,6 +1,7 @@
 package migrator
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/pressly/goose/v3"
@@ -18,7 +19,7 @@ func NewMigrator(db *sql.DB, migrationsDir string) *Migrator {
 	}
 }
 
-func (m *Migrator) Up() error {
+func (m *Migrator) Up(ctx context.Context) error {
 	err := goose.Up(m.db, m.migrationsDir)
 	if err != nil {
 		return err
